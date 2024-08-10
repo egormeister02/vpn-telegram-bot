@@ -1,0 +1,6 @@
+*.pyc
+__pycache__
+init_database
+docker-compose.yml
+.*
+Dockerfile

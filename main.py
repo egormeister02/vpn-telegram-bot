@@ -1,4 +1,5 @@
 import asyncio
+import asyncpg
 import logging
 
 from aiogram import Bot, Dispatcher
@@ -8,13 +9,27 @@ from aiogram.fsm.storage.memory import MemoryStorage
 import config
 from handlers import router
 
+async def create_db_pool():
+    try:
+        return await asyncpg.create_pool(
+            user=config.POSTGRES_USER,
+            password=config.POSTGRES_PASSWORD,
+            database=config.POSTGRES_DB,
+            host=config.POSTGRES_HOST,
+            port=config.POSTGRES_PORT
+        )
+    except Exception as e:
+        logging.error(f"Ошибка при создании пула соединений с базой данных: {e}")
+        raise
 
 async def main():
-    bot = Bot(token=config.BOT_TOKEN, parse_mode=ParseMode.HTML)
+    logging.info("Запуск приложения...")
+
+    bot = Bot(token=config.BOT_TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(router)
     await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+    await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types(), parse_mode=ParseMode.HTML)
 
 
 if __name__ == "__main__":
