@@ -1,7 +1,7 @@
 
 from envparse import env
 
-env.read_envfile()
+#env.read_envfile()
 
 # BOT
 BOT_TOKEN = env.str('BOT_TOKEN')

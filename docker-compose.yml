@@ -76,3 +76,5 @@ networks:
 
 volumes:
   db-data: 
+  pgadmin-data:
+

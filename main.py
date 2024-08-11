@@ -24,13 +24,28 @@ async def create_db_pool():
 
 async def main():
     logging.info("Запуск приложения...")
+    
+    pool = await create_db_pool()
+
+    # Здесь добавьте лог перед тем, как будет выполнен запрос к базе данных
+    logging.info("Подключение к базе данных и получение данных...")
+
+    await fetch_accounts(pool)
 
     bot = Bot(token=config.BOT_TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(router)
+
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types(), parse_mode=ParseMode.HTML)
 
+
+async def fetch_accounts(pool):
+    async with pool.acquire() as conn:
+        rows = await conn.fetch("SELECT * FROM main.users")
+        for row in rows:
+            logging.info(f"Получены данные из базы: {row}")
+    await pool.close()
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
